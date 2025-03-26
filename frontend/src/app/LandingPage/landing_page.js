@@ -77,16 +77,7 @@ const LandingPage = () => {
               </div>
             </a>
           </div>
-        </div>
-
-        {/* Right Content - Hero Image */}
-        <div className="hidden md:flex justify-center">
-          <img 
-            src="/api/placeholder/500/500" 
-            alt="Fitness Tracking" 
-            className="rounded-2xl shadow-2xl transform hover:scale-105 transition duration-300"
-          />
-        </div>
+        </div> 
       </main>
 
       {/* Features Section */}
