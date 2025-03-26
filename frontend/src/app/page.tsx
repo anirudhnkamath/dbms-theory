@@ -103,6 +103,10 @@
 // }
 
 import LandingPage from './LandingPage/landing_page';
+import UserLogin from './LoginPage/user_login';
+import TrainerLogin from './LoginPage/trainer_login';
+import SignUpPage from './SignUpPage/user_signup';
+import TrainerSignUpPage from './SignUpPage/trainer_signup';
 
 export default function RenderPage() {
   return (
