@@ -36,15 +36,11 @@ async function initializeDatabase() {
 initializeDatabase();
 
 
-
-
 app.use("/user", userroute);
 app.use("/trainer", trainerroute);
 
 
-
-
-const curport = 3000;
+const curport = 8000;
 app.listen(curport, () => {
   console.log(`Server running at port ${curport}`);
 })
