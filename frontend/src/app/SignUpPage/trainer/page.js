@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link'
 
 export default function TrainerSignup() {
   const [formData, setFormData] = useState({
@@ -89,9 +90,11 @@ export default function TrainerSignup() {
                 Sign Up
               </Button>
             </div>
+            <Link href="/LoginPage/trainer" className="block">
             <p className="col-span-2 text-green-600 hover:text-green-800 cursor-pointer text-sm text-center" onClick={() => router.push('/trainer-login')}>
               Already have an account? Login
             </p>
+            </Link>
           </form>
         </div>
       </div>

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Heart, User, Lock, Eye } from 'lucide-react';
+import Link from 'next/link';
+
 
 const LoginPage = () => {
   return (
@@ -49,9 +51,11 @@ const LoginPage = () => {
             Login
           </button>
           <p className="mt-4 text-blue-600 hover:text-blue-800 cursor-pointer text-sm">Forgot Password?</p>
+          <Link href="/SignUpPage/user" className="block">
           <p className="mt-2 text-gray-700 text-sm">
           <span className="text-blue-600 hover:text-blue-800 cursor-pointer font-semibold">Sign Up</span>
           </p>
+          </Link>
         </div>
       </div>
     </div>

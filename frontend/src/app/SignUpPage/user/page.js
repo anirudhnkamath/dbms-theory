@@ -1,5 +1,6 @@
 import React from 'react';
 import { Heart, User, Lock, Calendar, Phone, Ruler, Weight, ArrowRight } from 'lucide-react';
+import Link from 'next/link'
 
 const SignUpPage = () => {
   return (
@@ -78,12 +79,16 @@ const SignUpPage = () => {
               </div>
             </div>
           </div>
-          <button className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
-            Sign Up
-          </button>
+          
+          <p className="mt-2 text-gray-700 text-sm">
+          <span className="text-blue-600 hover:text-blue-800 cursor-pointer font-semibold">Sign Up</span>
+          </p>
+          <Link href="/LoginPage/user" className="block">
           <p className="mt-4 text-gray-700 text-sm">
             Already have an account? <a href="/login" className="text-blue-600 hover:text-blue-800 cursor-pointer font-semibold">Log In</a>
           </p>
+          </Link>
+
         </div>
       </div>
     </div>

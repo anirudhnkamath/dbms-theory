@@ -1,4 +1,6 @@
 "use client";
+import Link from 'next/link';
+
 
 import React, { useState } from 'react';
 import { Dumbbell, User, Lock, Eye, EyeOff } from 'lucide-react';
@@ -82,12 +84,14 @@ export default function TrainerLogin() {
               Login
             </Button>
             <p className="mt-4 text-green-600 hover:text-green-800 cursor-pointer text-sm">Forgot Password?</p>
+            <Link href="/SignUpPage/trainer" className="block">
             <p 
               className="mt-2 text-green-600 hover:text-green-800 cursor-pointer text-sm"
               onClick={() => router.push('/trainer-signup')}
             >
               New Trainer? Sign Up
             </p>
+            </Link>
           </form>
         </div>
       </div>

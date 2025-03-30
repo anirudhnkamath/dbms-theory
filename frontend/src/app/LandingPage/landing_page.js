@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Heart, UserCheck, Dumbbell, ChevronRight } from 'lucide-react';
 
 const LandingPage = () => {
@@ -32,15 +33,15 @@ const LandingPage = () => {
           </div>
         </div>
         <div className="space-x-4">
-          <a href="/login" className="text-blue-700 hover:text-blue-900 transition">
+          <Link href="/LoginPage/user" className="text-blue-700 hover:text-blue-900 transition">
             Login
-          </a>
-          <a 
-            href="/signup" 
+          </Link>
+          <Link 
+            href="/SignUpPage/user" 
             className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition"
           >
             Sign Up
-          </a>
+          </Link>
         </div>
       </nav>
 
@@ -57,7 +58,7 @@ const LandingPage = () => {
           
           {/* Login Options */}
           <div className="space-y-4">
-            <a href="/login/user" className="block">
+            <Link href="/LoginPage/user" className="block">
               <div className="flex items-center justify-between bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition">
                 <div className="flex items-center space-x-4">
                   <UserCheck className="text-blue-600" size={24} />
@@ -65,9 +66,9 @@ const LandingPage = () => {
                 </div>
                 <ChevronRight className="text-blue-600" />
               </div>
-            </a>
+            </Link>
             
-            <a href="/login/trainer" className="block">
+            <Link href="/LoginPage/trainer" className="block">
               <div className="flex items-center justify-between bg-white shadow-md rounded-lg p-4 hover:shadow-xl transition">
                 <div className="flex items-center space-x-4">
                   <Dumbbell className="text-green-600" size={24} />
@@ -75,7 +76,7 @@ const LandingPage = () => {
                 </div>
                 <ChevronRight className="text-green-600" />
               </div>
-            </a>
+            </Link>
           </div>
         </div> 
       </main>
