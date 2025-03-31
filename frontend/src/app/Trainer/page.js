@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const Trainer = ({ params }) => {
+const Trainer = () => {
   // Access trainerId directly from params (no useParams needed)
-  const { trainerId } = params;
+  // const storedTrainer = localStorage.getItem("trainer");
+  // const trainerId = storedTrainer ? JSON.parse(storedTrainer).id : null;
 
+  const [trainerId, setTrainerId] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [trainer, setTrainer] = useState(null);
   const [foods, setFoods] = useState([]);
@@ -14,6 +16,15 @@ const Trainer = ({ params }) => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Retrieve trainerId from localStorage
+    const storedTrainer = localStorage.getItem("trainer");
+    if (storedTrainer) {
+      const parsedTrainer = JSON.parse(storedTrainer);
+      setTrainerId(parsedTrainer.id);
+    }
+  }, []);
 
   useEffect(() => {
     const fetchTrainerData = async () => {
@@ -27,10 +38,10 @@ const Trainer = ({ params }) => {
           experience: "5 years"
         });
 
-        const foodsResponse = await axios.get(`/api/${trainerId}/foods`);
-        const exercisesResponse = await axios.get(`/api/${trainerId}/exercises`);
-        const dietsResponse = await axios.get(`/api/${trainerId}/diets`);
-        const workoutsResponse = await axios.get(`/api/${trainerId}/workouts`);
+        const foodsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/foods`) || [];
+        const exercisesResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/exercises`);
+        const dietsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/diets`);
+        const workoutsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/workouts`);
 
         setFoods(foodsResponse.data);
         setExercises(exercisesResponse.data);
@@ -108,7 +119,7 @@ const Trainer = ({ params }) => {
   const createFood = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/create-food", {
+      const response = await axios.post("http://localhost:8000/trainer/create-food", {
         trainer_t_id: trainerId,
         ...newFood,
         calories: parseInt(newFood.calories),
@@ -148,7 +159,7 @@ const Trainer = ({ params }) => {
   const createExercise = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("/api/create-exercise", {
+      const response = await axios.post("http://localhost:8000/trainer/create-exercise", {
         trainer_t_id: trainerId,
         name: newExercise.name,
       });
@@ -186,7 +197,7 @@ const Trainer = ({ params }) => {
         })),
       };
 
-      const response = await axios.post("/api/create-workout", workoutData);
+      const response = await axios.post("http://localhost:8000/trainer/create-workout", workoutData);
 
       // Add the new workout to the list
       setWorkouts([
@@ -229,7 +240,7 @@ const Trainer = ({ params }) => {
         })),
       };
 
-      const response = await axios.post("/api/create-diet", dietData);
+      const response = await axios.post("http://localhost:8000/trainer/create-diet", dietData);
 
       // Add the new diet to the list with calculated totals from response
       setDiets([

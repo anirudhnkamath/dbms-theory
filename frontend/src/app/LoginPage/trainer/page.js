@@ -12,11 +12,40 @@ export default function TrainerLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log("Trainer Login:", { email, password });
+    setIsLoading(true);
+    setError("");
+    
+    try {
+      const response = await fetch('http://localhost:8000/trainer/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+      
+      // Save trainer data to localStorage or state management solution
+      localStorage.setItem('trainer', JSON.stringify(data.trainer));
+      
+      // Navigate to trainer dashboard
+      router.push(`/Trainer/`);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,6 +77,9 @@ export default function TrainerLogin() {
           <h2 className="text-2xl font-bold text-green-900 mb-6">
             Trainer Login
           </h2>
+          {error && (
+            <p className="text-red-500 mb-4 text-sm">{error}</p>
+          )}
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="flex flex-col text-left">
               <Label
@@ -64,7 +96,7 @@ export default function TrainerLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full outline-none bg-transparent text-gray-900 placeholder-gray-500 border-none focus:ring-0i"
+                  className="w-full outline-none bg-transparent text-gray-900 placeholder-gray-500 border-none focus:ring-0"
                   required
                 />
               </div>
@@ -97,22 +129,18 @@ export default function TrainerLogin() {
                 </button>
               </div>
             </div>
-            <Link href="/Trainer/${trainerId}" className="block">
-              <Button
-                type="submit"
-                className="mt-6 w-full bg-green-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition"
-              >
-                Login
-              </Button>
-            </Link>
+            <Button
+              type="submit"
+              className="mt-6 w-full bg-green-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-green-700 transition"
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging in..." : "Login"}
+            </Button>
             <p className="mt-4 text-green-600 hover:text-green-800 cursor-pointer text-sm">
               Forgot Password?
             </p>
             <Link href="/SignUpPage/trainer" className="block">
-              <p
-                className="mt-2 text-green-600 hover:text-green-800 cursor-pointer text-sm"
-                onClick={() => router.push("/trainer-signup")}
-              >
+              <p className="mt-2 text-green-600 hover:text-green-800 cursor-pointer text-sm">
                 New Trainer? Sign Up
               </p>
             </Link>
