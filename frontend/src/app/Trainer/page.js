@@ -16,6 +16,9 @@ const Trainer = () => {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [name, setName] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [experience, setExp] = useState(null);
 
   useEffect(() => {
     // Retrieve trainerId from localStorage
@@ -23,6 +26,9 @@ const Trainer = () => {
     if (storedTrainer) {
       const parsedTrainer = JSON.parse(storedTrainer);
       setTrainerId(parsedTrainer.id);
+      setName(parsedTrainer.name);
+      setEmail(parsedTrainer.email);
+      setExp(parsedTrainer.experience);
     }
   }, []);
 
@@ -31,12 +37,11 @@ const Trainer = () => {
         try {
             setLoading(true);
 
-            // Set default trainer details
             setTrainer({
                 id: trainerId,
-                name: "John Doe",
-                email: "john.doe@example.com",
-                experience: "5 years"
+                name: name,
+                email: email,
+                experience: experience + " years"
             });
 
             // Fetch data with error handling for each API call
