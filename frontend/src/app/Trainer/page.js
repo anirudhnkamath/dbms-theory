@@ -35,6 +35,11 @@ const Trainer = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("trainer"); // Clear local storage
+    router.push("/LoginPage/trainer"); // Redirect to login page
+  };
+
   useEffect(() => {
     const fetchTrainerData = async () => {
         try {
@@ -707,6 +712,11 @@ const Trainer = () => {
             </div>
           </div>
         )}
+
+      <button
+        onClick={handleLogout}
+        className="fixed top-4 right-6 px-5 py-2 bg-[#359488] text-white rounded-lg shadow-md transition-all duration-300 hover:bg-[#2d8075] hover:shadow-lg"
+      >Logout</button>
 
         {/* Diets Tab */}
         {activeTab === "diets" && (
