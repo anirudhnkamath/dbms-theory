@@ -28,35 +28,50 @@ const Trainer = () => {
 
   useEffect(() => {
     const fetchTrainerData = async () => {
-      try {
-        setLoading(true);
-        // Use the trainerId from params
-        setTrainer({
-          id: trainerId,
-          name: "John Doe",
-          email: "john.doe@example.com",
-          experience: "5 years"
-        });
+        try {
+            setLoading(true);
 
-        const foodsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/foods`) || [];
-        const exercisesResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/exercises`);
-        const dietsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/diets`);
-        const workoutsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/workouts`);
+            // Set default trainer details
+            setTrainer({
+                id: trainerId,
+                name: "John Doe",
+                email: "john.doe@example.com",
+                experience: "5 years"
+            });
 
-        setFoods(foodsResponse.data);
-        setExercises(exercisesResponse.data);
-        setDiets(dietsResponse.data);
-        setWorkouts(workoutsResponse.data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching trainer data:', err);
-        setError('Failed to load trainer data. Please try again later.');
-        setLoading(false);
-      }
+            // Fetch data with error handling for each API call
+            const foodsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/foods`)
+                .then(res => res.data)
+                .catch(() => []); // Return empty array on failure
+
+            const exercisesResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/exercises`)
+                .then(res => res.data)
+                .catch(() => []);
+
+            const dietsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/diets`)
+                .then(res => res.data)
+                .catch(() => []);
+
+            const workoutsResponse = await axios.get(`http://localhost:8000/trainer/${trainerId}/workouts`)
+                .then(res => res.data)
+                .catch(() => []);
+
+            // ✅ Set states safely, even if some APIs fail
+            setFoods(foodsResponse);
+            setExercises(exercisesResponse);
+            setDiets(dietsResponse);
+            setWorkouts(workoutsResponse);
+
+        } catch (err) {
+            console.error("Error fetching trainer data:", err);
+            setError("Failed to load trainer data. Please try again later.");
+        } finally {
+            setLoading(false); // Ensure loading state is cleared
+        }
     };
 
     if (trainerId) {
-      fetchTrainerData();
+        fetchTrainerData();
     }
   }, [trainerId]);
 
