@@ -1,12 +1,13 @@
 "use client"; 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 
 const Trainer = () => {
   // Access trainerId directly from params (no useParams needed)
   // const storedTrainer = localStorage.getItem("trainer");
   // const trainerId = storedTrainer ? JSON.parse(storedTrainer).id : null;
-
+  const router = useRouter();
   const [trainerId, setTrainerId] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [trainer, setTrainer] = useState(null);
@@ -29,6 +30,8 @@ const Trainer = () => {
       setName(parsedTrainer.name);
       setEmail(parsedTrainer.email);
       setExp(parsedTrainer.experience);
+    } else {
+      router.push("/LoginPage/trainer"); // Redirect to login if no trainer is stored
     }
   }, []);
 
