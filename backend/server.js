@@ -13,7 +13,7 @@ app.use(cors());
 const dbconfig = {
   host: "localhost",
   user: "root",
-  password: "Asmm@9035",
+  password: "12345",
   database: "mydb",
   multipleStatements: true,
 };
