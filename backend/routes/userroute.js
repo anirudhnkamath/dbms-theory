@@ -6,7 +6,7 @@ const router = express.Router();
 const dbconfig = {
   host: "localhost",
   user: "root",
-  password: "12345678",
+  password: "190106",
   database: "mydb",
   multipleStatements: true,
 };
@@ -368,6 +368,111 @@ router.post("/login", async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({ 
       message: 'Login failed', 
+      error: error.message 
+    });
+  }
+});
+
+router.post("/health-metrics", async (req, res) => {
+  const { user_id, weight, height, heart_rate, BP } = req.body;
+  
+  try {
+    // Validate input
+    if (!user_id || !weight || !height) {
+      return res.status(400).json({ 
+        message: 'User ID, weight, and height are required' 
+      });
+    }
+
+    // Verify user exists
+    const [users] = await pool.execute(
+      'SELECT u_id FROM user WHERE u_id = ?',
+      [user_id]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ 
+        message: 'User not found' 
+      });
+    }
+
+    // Get current date and time
+    const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    // Insert health metrics
+    const [result] = await pool.execute(
+      'INSERT INTO health_metrics (user_id, weight, height, heart_rate, BP, date) VALUES (?, ?, ?, ?, ?, ?)',
+      [user_id, weight, height, heart_rate || null, BP || null, date]
+    );
+
+    // Prepare response
+    res.status(201).json({
+      message: 'Health metrics recorded successfully',
+      metrics: {
+        m_id: result.insertId,
+        user_id,
+        weight,
+        height,
+        BMI: (weight / (height * height)).toFixed(2),
+        heart_rate: heart_rate || null,
+        BP: BP || null,
+        date
+      }
+    });
+  } catch (error) {
+    console.error('Health metrics recording error:', error);
+    res.status(500).json({ 
+      message: 'Failed to record health metrics', 
+      error: error.message 
+    });
+  }
+});
+
+router.get("/health-metrics/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  
+  try {
+    // Validate input
+    if (!userId) {
+      return res.status(400).json({ 
+        message: 'User ID is required' 
+      });
+    }
+
+    // Verify user exists
+    const [users] = await pool.execute(
+      'SELECT u_id FROM user WHERE u_id = ?',
+      [userId]
+    );
+
+    if (users.length === 0) {
+      return res.status(404).json({ 
+        message: 'User not found' 
+      });
+    }
+
+    // Get health metrics for the user
+    const [metrics] = await pool.execute(
+      'SELECT m_id, user_id, weight, height, BMI, heart_rate, BP, date FROM health_metrics WHERE user_id = ? ORDER BY date DESC',
+      [userId]
+    );
+
+    // Prepare response
+    if (metrics.length === 0) {
+      return res.status(404).json({
+        message: 'No health metrics found for this user'
+      });
+    }
+
+    res.status(200).json({
+      message: 'Health metrics retrieved successfully',
+      user_id: parseInt(userId),
+      metrics: metrics
+    });
+  } catch (error) {
+    console.error('Health metrics retrieval error:', error);
+    res.status(500).json({ 
+      message: 'Failed to retrieve health metrics', 
       error: error.message 
     });
   }

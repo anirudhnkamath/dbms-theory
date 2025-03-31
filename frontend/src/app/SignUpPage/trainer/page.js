@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link'
+import axios from "axios"
 
 export default function TrainerSignup() {
   const [formData, setFormData] = useState({
@@ -23,10 +24,33 @@ export default function TrainerSignup() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSignup = (e) => {
-    e.preventDefault();
-    console.log('Trainer Signup:', formData);
-  };
+  const handleSignup = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await axios.post("http://localhost:8000/trainer/register", formData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = response.data;
+
+    if (response.status === 201) {
+      // Store trainer details in localStorage
+      localStorage.setItem("trainer", JSON.stringify(data.trainer));
+
+      // Redirect to /Trainer page
+      router.push("/Trainer");
+    } else {
+      console.error("Signup failed:", data.message);
+      alert(data.message); // Show error message
+    }
+  } catch (error) {
+    console.error("Error:", error.response?.data?.message || error);
+    alert(error.response?.data?.message || "Something went wrong. Please try again.");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center text-green-900 px-8">

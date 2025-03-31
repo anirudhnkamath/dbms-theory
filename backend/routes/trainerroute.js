@@ -6,7 +6,7 @@ const router = express.Router();
 const dbconfig = {
   host: "localhost",
   user: "root",
-  password: "12345678",
+  password: "190106",
   database: "mydb",
   multipleStatements: true,
 };
@@ -198,12 +198,11 @@ router.post("/create-workout", async (req, res) => {
   }
 });
 
+
 router.post("/register", async (req, res) => {
-  console.log("register");
   const { name, email, password, phone_no, experience } = req.body;
 
   try { 
-
     if (password.length < 8) {
       return res.status(400).json({ 
         message: 'Password must be at least 8 characters long' 
@@ -220,7 +219,12 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({
       message: 'Trainer registered successfully',
-      trainerId: result.insertId
+      trainer: {
+        id: result.insertId,
+        name,
+        email,
+        experience
+      }
     });
 
   } catch (error) {
