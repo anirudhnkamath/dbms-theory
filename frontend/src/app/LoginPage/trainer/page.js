@@ -16,6 +16,10 @@ export default function TrainerLogin() {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  const handleGoHome = () => {
+    router.push('/');
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -74,6 +78,23 @@ export default function TrainerLogin() {
       {/* Right Side - Login Box */}
       <div className="w-1/2 flex items-center justify-center">
         <div className="shadow-lg rounded-2xl p-8 w-96 text-center border border-gray-300 bg-white">
+        <button
+          onClick={handleGoHome}
+          className="flex items-center justify-center bg-green-500 text-white w-12 h-12 rounded-full shadow-md hover:bg-green-400 transition-all"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-6 h-6 rotate-90 scale-x-[-1]"
+          >
+            <path
+              fillRule="evenodd"
+              d="M12 4a6 6 0 0 0-6 6v5h2v-5a4 4 0 1 1 8 0v5h-3l4 4 4-4h-3v-5a6 6 0 0 0-6-6z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </button>
           <h2 className="text-2xl font-bold text-green-900 mb-6">
             Trainer Login
           </h2>
