@@ -2,7 +2,7 @@
 import Link from "next/link";
 
 import React, { useState } from "react";
-import { Dumbbell, User, Lock, Eye, EyeOff } from "lucide-react";
+import { Dumbbell, User, Lock, Eye, EyeOff, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,23 +78,24 @@ export default function TrainerLogin() {
       {/* Right Side - Login Box */}
       <div className="w-1/2 flex items-center justify-center">
         <div className="shadow-lg rounded-2xl p-8 w-96 text-center border border-gray-300 bg-white">
-        <button
-          onClick={handleGoHome}
-          className="flex items-center justify-center bg-green-500 text-white w-12 h-12 rounded-full shadow-md hover:bg-green-400 transition-all"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6 rotate-90 scale-x-[-1]"
+          <button
+            onClick={handleGoHome}
+            className="hover:cursor-pointer flex items-center justify-center w-12 h-12 rounded-full bg-transparent transition-all"
           >
-            <path
-              fillRule="evenodd"
-              d="M12 4a6 6 0 0 0-6 6v5h2v-5a4 4 0 1 1 8 0v5h-3l4 4 4-4h-3v-5a6 6 0 0 0-6-6z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
+            <div className="relative">
+              <Heart
+                className="text-red-500 animate-pulse"
+                size={48}
+                fill="currentColor"
+                fillOpacity={0.4}
+              />
+              
+              {/* Inner solid heart */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Heart className="text-red-600" size={24} strokeWidth={3} />
+              </div>
+            </div>
+          </button>
           <h2 className="text-2xl font-bold text-green-900 mb-6">
             Trainer Login
           </h2>
