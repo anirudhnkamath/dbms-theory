@@ -3,13 +3,19 @@
 import React, { useState } from "react";
 import { Heart, User, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 
 export default function UserLogin() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleGoHome = () => {
+    router.push('/');
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -49,17 +55,19 @@ export default function UserLogin() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-900">
       {/* Left Side - Logo and Name */}
       <div className="w-1/2 flex flex-col items-center justify-center text-center p-10">
-        <div className="relative mb-4">
-          <Heart
-            className="text-red-500 animate-pulse"
-            size={70}
-            fill="currentColor"
-            fillOpacity={0.3}
-          />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Heart className="text-red-600" size={32} strokeWidth={3} />
+      <button onClick={handleGoHome} className="hover:cursor-pointer">
+          <div className="relative mb-4">
+            <Heart
+              className="text-red-500 animate-pulse"
+              size={70}
+              fill="currentColor"
+              fillOpacity={0.3}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Heart className="text-red-600" size={32} strokeWidth={3} />
+            </div>
           </div>
-        </div>
+      </button>
         <h1 className="text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
           HealthSync
         </h1>
