@@ -44,6 +44,7 @@ export default function UserDashboard() {
           ]);
           setWorkouts(workoutsResponse || { total_workouts: 0, workouts: [] });
           setDiets(dietsResponse || { total_diets: 0, diets: [] });
+          console.log(workouts.workouts);
         } catch (err) {
           setError("Failed to fetch data. Please try again later.");
         } finally {

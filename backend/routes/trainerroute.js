@@ -6,7 +6,7 @@ const router = express.Router();
 const dbconfig = {
   host: "localhost",
   user: "root",
-  password: "12345678",
+  password: "190106",
   database: "mydb",
   multipleStatements: true,
 };
@@ -56,15 +56,21 @@ router.post("/create-exercise", async (req, res) => {
 
 router.post("/create-diet", async (req, res) => {
   const { trainer_t_id, foods } = req.body;
-
+  
+  // Begin transaction to ensure data consistency
+  const connection = await pool.getConnection();
+  
   try {
-   
+    await connection.beginTransaction();
+    
     if (!foods || !Array.isArray(foods) || foods.length === 0) {
+      await connection.rollback();
+      connection.release();
       return res.status(400).json({
         message: 'At least one food item is required'
       });
     }
-
+    
     // Calculate total nutritional values
     const totalNutrition = foods.reduce((acc, food) => ({
       total_cals: acc.total_cals + (food.calories || 0),
@@ -77,9 +83,9 @@ router.post("/create-diet", async (req, res) => {
       total_fat: 0,
       total_carbs: 0
     });
-
+    
     // Insert diet
-    const [dietResult] = await pool.query(
+    const [dietResult] = await connection.query(
       'INSERT INTO diet (total_cals, total_protein, total_fat, total_carbs) VALUES (?, ?, ?, ?)',
       [
         totalNutrition.total_cals, 
@@ -88,30 +94,52 @@ router.post("/create-diet", async (req, res) => {
         totalNutrition.total_carbs
       ]
     );
+    
     const dietId = dietResult.insertId;
-
+    
     // Insert diet-food associations
     const dietFoodInserts = foods.map(food => 
-      pool.query(
+      connection.query(
         'INSERT INTO diet_has_food (diet_d_id, food_f_id) VALUES (?, ?)', 
         [dietId, food.f_id]
       )
     );
     await Promise.all(dietFoodInserts);
-
+    
     // Insert trainer-diet association
-    await pool.query(
+    await connection.query(
       'INSERT INTO trainer_has_diet (trainer_t_id, diet_d_id) VALUES (?, ?)',
       [trainer_t_id, dietId]
     );
-
+    
+    // Get all users associated with this trainer
+    const [users] = await connection.query(
+      'SELECT u_id FROM user WHERE trainer_t_id = ?',
+      [trainer_t_id]
+    );
+    
+    // Insert records into user_diets for each user
+    if (users.length > 0) {
+      const userDietInserts = users.map(user => 
+        connection.query(
+          'INSERT INTO user_diets (user_id, trainer_id, diet_id) VALUES (?, ?, ?)',
+          [user.u_id, trainer_t_id, dietId]
+        )
+      );
+      await Promise.all(userDietInserts);
+    }
+    
+    await connection.commit();
+    
     res.status(201).json({
-      message: 'Diet created successfully',
+      message: 'Diet created successfully and assigned to all users',
       dietId: dietId,
-      totalNutrition
+      totalNutrition,
+      assignedUsers: users.length
     });
-
+    
   } catch (error) {
+    await connection.rollback();
     console.error('Diet creation error:', error);
     
     // Handle specific error types
@@ -121,24 +149,28 @@ router.post("/create-diet", async (req, res) => {
         error: error.message
       });
     }
-
+    
     res.status(500).json({ 
       message: 'Diet creation failed', 
       error: error.message 
     });
-  }
+    
+  } 
 });
 
 router.post("/create-workout", async (req, res) => {
   const { trainer_t_id, name, duration, difficulty, exercises } = req.body;
   try {
+    // Begin transaction for data consistency
+    await pool.query('START TRANSACTION');
+    
     // Validate input
     if (!exercises || !Array.isArray(exercises) || exercises.length === 0) {
+      await pool.query('ROLLBACK');
       return res.status(400).json({
         message: 'At least one exercise is required'
       });
     }
-
 
     // Insert workout
     const [workoutResult] = await pool.query(
@@ -146,7 +178,6 @@ router.post("/create-workout", async (req, res) => {
       [name, duration, difficulty]
     );
     const workoutId = workoutResult.insertId;
-
 
     // Insert workout-exercise associations with reps and sets
     const workoutExerciseInserts = exercises.map(exercise => 
@@ -157,22 +188,45 @@ router.post("/create-workout", async (req, res) => {
     );
     await Promise.all(workoutExerciseInserts);
 
-
     // Insert trainer-workout association
     await pool.query(
       'INSERT INTO trainer_has_workout (trainer_t_id, workout_w_id) VALUES (?, ?)',
       [trainer_t_id, workoutId]
     );
     
+    // Get all users who have this trainer
+    const [trainerUsers] = await pool.query(
+      'SELECT u_id FROM user WHERE trainer_t_id = ?',
+      [trainer_t_id]
+    );
+    
+    // If the trainer has users, assign the workout to all of them
+    let assignedUserCount = 0;
+    if (trainerUsers.length > 0) {
+      const userWorkoutValues = trainerUsers.map(user => [user.u_id, trainer_t_id, workoutId]);
+      
+      // Bulk insert into user_workouts table
+      await pool.query(
+        'INSERT INTO user_workouts (user_id, trainer_id, workout_id) VALUES ?',
+        [userWorkoutValues]
+      );
+      
+      assignedUserCount = trainerUsers.length;
+    }
+    
+    // Commit the transaction
+    await pool.query('COMMIT');
 
     res.status(201).json({
       message: 'Workout created successfully',
       workoutId: workoutId,
-      exercises: exercises
+      exercises: exercises,
+      assignedToUsers: assignedUserCount
     });
 
-
   } catch (error) {
+    // Rollback in case of error
+    await pool.query('ROLLBACK');
     console.error('Workout creation error:', error);
     
     // Handle specific error types
@@ -182,7 +236,6 @@ router.post("/create-workout", async (req, res) => {
         error: error.message
       });
     }
-
     // Handle unique constraint violation for workout name
     if (error.code === 'ER_DUP_ENTRY') {
       return res.status(400).json({
@@ -190,14 +243,12 @@ router.post("/create-workout", async (req, res) => {
         error: error.message
       });
     }
-
     res.status(500).json({ 
       message: 'Workout creation failed', 
       error: error.message 
     });
   }
 });
-
 
 router.post("/register", async (req, res) => {
   const { name, email, password, phone_no, experience } = req.body;
