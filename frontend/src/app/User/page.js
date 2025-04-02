@@ -31,6 +31,28 @@ export default function UserDashboard() {
       localStorage.removeItem("user");
       router.push("/LoginPage/user");
     };
+
+    function getAge(dobString) {
+        const birthDate = new Date(dobString);
+        const today = new Date();
+    
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
+    
+        if (days < 0) {
+            months--;
+            const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += lastMonth.getDate();
+        }
+    
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+    
+        return `${years} years, ${months} months, ${days} days`;
+    }
   
     useEffect(() => {
       if (!userId) return;
@@ -193,6 +215,11 @@ export default function UserDashboard() {
                         <strong className="block text-blue-700 mb-1">Gender</strong>
                         <p className="text-blue-900 font-medium text-lg">{user.gender}</p>
                       </div>
+
+                      <div className="p-4 bg-blue-50 rounded-lg shadow-sm border border-blue-100 transition hover:shadow-md">
+                        <strong className="block text-blue-700 mb-1">Age</strong>
+                        <p className="text-blue-900 font-medium text-lg">{getAge(user.DOB)}</p>
+                      </div>
                     </div>
                     
                     <div className="space-y-4">
@@ -354,7 +381,7 @@ export default function UserDashboard() {
                               </div>
                               <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100 text-center">
                                 <p className="text-xs text-yellow-600 uppercase font-semibold tracking-wider mb-1">Fat</p>
-                                <p className="text-2xl font-bold text-yellow-700">{diet.total_fat}</p>
+                                <p className="text-2xl font-bold text-yellow-700">{Math.round(diet.total_fat)}</p>
                                 <p className="text-xs text-yellow-500">grams</p>
                               </div>
                               <div className="bg-green-50 p-4 rounded-lg border border-green-100 text-center">
@@ -391,7 +418,7 @@ export default function UserDashboard() {
                                         <td className="px-4 py-3 text-sm font-medium text-blue-800">{food.name}</td>
                                         <td className="px-4 py-3 text-sm text-blue-700">{food.calories} kcal</td>
                                         <td className="px-4 py-3 text-sm text-blue-700">{food.protein}g</td>
-                                        <td className="px-4 py-3 text-sm text-blue-700">{food.fat}g</td>
+                                        <td className="px-4 py-3 text-sm text-blue-700">{Math.round(food.fat)}g</td>
                                         <td className="px-4 py-3 text-sm text-blue-700">{food.carbs}g</td>
                                       </tr>
                                     ))
